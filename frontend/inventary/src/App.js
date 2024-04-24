@@ -4,6 +4,8 @@ import Home from "./components/Home";
 import Manage from "./components/Manage";
 import Delete from "./components/Delete";
 import Read from "./components/Read";
+import Register from "./components/Register";
+import Display from "./components/Display";
 
 function App() {
 
@@ -14,10 +16,8 @@ function App() {
         <Routes>
           <Route path="/*" element={<Home />} />
           <Route path="/home" element={<Home />} />
-          <Route path="/create" element={<Manage />} />
-          <Route path="/update" element={<Manage />} />
-          <Route path="/delete" element={<Delete />} />
-          <Route path="/read" element={<Read />} />
+          <Route path="/studentRegistration" element={<Register />} />
+          <Route path="/display" element={<Display />} />
         </Routes>
       </BrowserRouter>
     </div>

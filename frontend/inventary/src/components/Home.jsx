@@ -7,12 +7,10 @@ const Home = () => {
 
   return (
     <div>
-        <h1>Inventary Management System</h1>
+        <h1>MCA Admission Portal</h1>
         <div className='buttons'>
-        <button onClick={()=>navigation('/create')} >Create</button>
-        <button onClick={()=>navigation('/update')}>Update</button>
-        <button onClick={()=>navigation('/read')}>Display</button>
-        <button onClick={()=>navigation('/delete')}>Delete</button>
+        <button onClick={()=>navigation('/studentRegistration')} >Login as Student</button>
+        <button onClick={()=>navigation('/display')}>Login as Staff</button>
         </div>
    
 
