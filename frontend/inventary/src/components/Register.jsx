@@ -5,28 +5,15 @@ import { useNavigate } from 'react-router-dom'
 const Register = () => {
     const navigation = useNavigate();
     const [state, setState] = useState({});
-    const [type,setType] = useState('cancel');
+    const [type, setType] = useState('voter');
 
     let defaultState = {
-        UGCollegeName: '',
-        UGYearOfPassing: '',
         address: '',
-        dob: '',
-        gender: '',
         name: '',
         phone: '',
-        sem1: '',
-        sem2: '',
-        sem3: '',
-        sem4: '',
-        sem5: '',
-        sem6: '',
-        tenthMarkInPercentage: '',
-        tenthSchoolName: '',
-        tenthYearOfPassing: '',
-        twelthMarkInPercentage: '',
-        twelthSchoolName: '',
-        twelthYearOfPassing: ''
+        email: '',
+        Id: '',
+        symbol: '',
     }
 
     const handleChange = (e) => {
@@ -35,87 +22,62 @@ const Register = () => {
 
 
     const submit = () => {
-        if (type === 'update') {
-            axios.put('http://localhost:5000/updateItem', state)
+        if (type === 'voter') {
+            axios.post('http://localhost:5000/voterReg', state)
                 .then(res => {
-                    alert("Item Updated Successfully")
+                    alert("Voter added Successfully")
                 })
         } else {
-            axios.post('http://localhost:5000/createItem', state)
+            axios.post('http://localhost:5000/candidateReg', state)
                 .then((res) => {
-                    alert("Item Added Successfully");
+                    alert("Candidate Added Successfully");
                     setState(defaultState)
                 })
         }
     }
 
     const find = () => {
-          axios.get(`http://localhost:5000/getItemByPhone?phone=${state?.phone1}`)
-           .then(res => {
+        axios.get(`http://localhost:5000/getItemByPhone?phone=${state?.phone1}`)
+            .then(res => {
                 if (type === 'update') {
                     if (res.data.length > 0) {
-                        setState(prev => ({...prev,...res.data?.[0]}))
-                    } 
+                        setState(prev => ({ ...prev, ...res.data?.[0] }))
+                    }
                 }
             })
     }
 
-    console.log(state,type)
+    console.log(state, type)
     return (
         <div style={{ height: "100vh" }}>
-                   {type==='update' && 
-                <><label>Phone number</label>
-                <input name='phone1' type='number' value={state?.phone1} onChange={e => handleChange(e)} required />
-                <button onClick={e=>find()}>find</button>
-                </>}
+            <div>
+                <button onClick={()=>{setType('voter');setState(prev=>({...prev,symbol:''}))}}>Voter Registration</button>
+                <button onClick={()=>{setType('candidate');setState(prev=>({...prev,id:''}))}}>Candidate Registration</button>
+            </div>
             <form onSubmit={e => { e.preventDefault(); submit() }} method='post'>
-                <h1>Student Registration</h1>
-                <h4>Personal Details</h4>
+                <h1>{type} Registration</h1>
+                {
+                    type === 'voter' ?
+                        <>
+                            <label>Voter ID</label>
+                            <input name='id' value={state?.id} onChange={e => handleChange(e)} required />
+                        </>
+                        :
+                        <>
+                            <label>Symbol</label>
+                            <input name='symbol' value={state?.symbol} onChange={e => handleChange(e)} required />
+                        </>
+                }
                 <label>Name</label>
                 <input name='name' value={state?.name} onChange={e => handleChange(e)} required />
                 <label>Phone number</label>
                 <input name='phone' type='number' value={state?.phone} onChange={e => handleChange(e)} required />
-                <label>Date of birth</label>
-                <input name='dob' type='date' value={state?.dob} onChange={e => handleChange(e)} required />
-                <label>Gender</label>
-                <input name='gender' value={state?.gender} onChange={e => handleChange(e)} required />
+                <label>Email</label>
+                <input name='email' type='email' value={state?.email} onChange={e => handleChange(e)} required />
                 <label>Address</label>
                 <input name='address' type='textArea' value={state?.address} onChange={e => handleChange(e)} required />
-                <h4>Education Details</h4>
-                <p>SSLC Details</p>
-                <label>School Name</label>
-                <input name='tenthSchoolName' value={state?.tenthSchoolName} onChange={e => handleChange(e)} required />
-                <label>Year of passing</label>
-                <input name='tenthYearOfPassing' type='year' value={state?.tenthYearOfPassing} onChange={e => handleChange(e)} required />
-                <label>Mark in percentage</label>
-                <input name='tenthMarkInPercentage' type='number' value={state?.tenthMarkInPercentage} onChange={e => handleChange(e)} required />
-                <p>HSC Details</p>
-                <label>School Name</label>
-                <input name='twelthSchoolName' value={state?.twelthSchoolName} onChange={e => handleChange(e)} required />
-                <label>Year of passing</label>
-                <input name='twelthYearOfPassing' type='year' value={state?.twelthYearOfPassing} onChange={e => handleChange(e)} required />
-                <label>Mark in percentage</label>
-                <input name='twelthMarkInPercentage' type='number' value={state?.twelthMarkInPercentage} onChange={e => handleChange(e)} required />
-                <p>UG Details</p>
-                <label>College Name</label>
-                <input name='UGCollegeName' value={state?.UGCollegeName} onChange={e => handleChange(e)} required />
-                <label>Year of passing</label>
-                <input name='UGYearOfPassing' type='year' value={state?.UGYearOfPassing} onChange={e => handleChange(e)} required />
-                <label>Sem 1 Mark in percentage</label>
-                <input name='sem1' type='number' value={state?.sem1} onChange={e => handleChange(e)} required />
-                <label>Sem 2 Mark in percentage</label>
-                <input name='sem2' type='number' value={state?.sem2} onChange={e => handleChange(e)} required />
-                <label>Sem 3 Mark in percentage</label>
-                <input name='sem3' type='number' value={state?.sem3} onChange={e => handleChange(e)} required />
-                <label>Sem 4 Mark in percentage</label>
-                <input name='sem4' type='number' value={state?.sem4} onChange={e => handleChange(e)} required />
-                <label>Sem 5 Mark in percentage</label>
-                <input name='sem5' type='number' value={state?.sem5} onChange={e => handleChange(e)} required />
-                <label>Sem 6 Mark in percentage</label>
-                <input name='sem6' type='number' value={state?.sem6} onChange={e => handleChange(e)} />
 
                 <input type="submit" value="Submit"></input>
-                <button onClick={()=>{setType((prev)=>prev==='cancel'?'update':"cancel");setState(defaultState)}}>{type==='cancel'?'Edit':"cancel"}</button>
                 <input type="submit" value="Home" onClick={() => navigation('/home')}></input>
             </form>
         </div>

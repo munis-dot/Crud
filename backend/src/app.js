@@ -2,12 +2,29 @@ import express from 'express'
 import mongoose from 'mongoose'
 import Item from './model/item.js'
 import Student from './model/students.js'
+import Voter from './model/voter.js'
+import Candidate from './model/candidate.js'
 import cors from 'cors'
+import nodemailer from 'nodemailer'
+
 
 const app = express();
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cors());
+
+let testAccount = await nodemailer.createTestAccount();
+// Create a transporter object using SMTP transport
+console.log(testAccount)
+let transporter = nodemailer.createTransport({
+  host: "smtp.ethereal.email",
+  port: 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: testAccount.user, // generated ethereal user
+    pass: testAccount.pass, // generated ethereal password
+  },
+});
 
 mongoose
   .connect('mongodb://127.0.0.1:27017/item')
@@ -18,37 +35,31 @@ app.get('/', (req, res) => {
   res.send("server started")
 })
 
-app.get('/getAllStudents', async(req, res) => {
+app.get('/getAllCandidate', async(req, res) => {
     try{
-      if(req.query.type==='eligible'){
-        let response = await Student.find({
-          $and: [
-            { $expr: { $gt: [ { $toInt: "$tenthMarkInPercentage" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$twelthMarkInPercentage" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$sem1" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$sem2" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$sem3" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$sem4" }, 60 ] } },
-            { $expr: { $gt: [ { $toInt: "$sem5" }, 60 ] } }
-          ]
-        });
+        let response = await Candidate.find({})
         res.send(response)
-      }
-      else{
-        let response = await Student.find({})
-        res.send(response)
-      }
-      
     }
     catch(e){
       throw e;
     }
 })
 
-app.post('/createItem',async(req,res)=>{
+app.get('/getUser', async(req, res) => {
+  try{
+    let query = {phone:req.query.phone};
+      let response = await Candidate.find(query)
+      res.send(response)
+  }
+  catch(e){
+    throw e;
+  }
+})
+
+app.post('/voterReg',async(req,res)=>{
     try{
       console.log(req.body);
-      let data = await Student.create(req.body);
+      let data = await Voter.create(req.body);
       res.send(data)
     }
     catch(e){
@@ -56,12 +67,28 @@ app.post('/createItem',async(req,res)=>{
     }
 })
 
-app.put('/updateItem',async(req,res)=>{
+app.post('/candidateReg',async(req,res)=>{
   try{
-    let query={phone:req.body.phone1};
-    console.log(req.body)
-    let response= await Student.updateOne(query,req.body)
+    console.log(req.body);
+    let data = await Candidate.create(req.body);
+    res.send(data)
+  }
+  catch(e){
+    throw e;
+  }
+})
+
+app.put('/vote',async(req,res)=>{
+  try{
+    let query={symbol:req.body.symbol};
+    let response= await Candidate.updateOne(query,{ $inc: { count: 1 } })
     res.send(response)
+    await transporter.sendMail({
+      from: testAccount.user, // Sender address
+      to: req.body.email, // List of recipients
+      subject: "Voting Successful",
+      text: "Voting Successful"
+    });
   }
   catch(e){
     throw e;
